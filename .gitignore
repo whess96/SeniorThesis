@@ -1,1 +1,4 @@
 .DS_Store
+
+# ignore compiled html files in MeetingNotes
+./MeetingNotes/*.html
