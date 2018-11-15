@@ -1,0 +1,19 @@
+Senior Thesis TODO list:
+
+Core Thesis Work:
+  Phase 1: Get the Plane Flying:
+    ☐ Read in Sensing data from Vicon system
+    ☐ Send signals to plane receiver from computer inputs
+    ☐ Establish rudimentary Vicon->RC feedback loop
+    ☐ Be able to fly plane in a consistent loop
+
+  Phase 2: Experiments with Adaptive Control:
+
+Purchases:
+  ✔ E-flite EFLU3950 Radio Control Airplane | UMX Timber BNF Basic RC Plane | Fully Assembled and Bind-N-Fly Ready @done (18-11-14 22:43)
+  ☐ 2.4 GHz Transmitter
+  ☐ Some way to control transmitter
+
+Logistics:
+  ☐ Vicon Training
+  ☐ Establish time to work in Forrestal lab
