@@ -1,4 +1,6 @@
 .DS_Store
+# Ignore Emacs backups
+*~
 
 # ignore compiled html files in MeetingNotes
 ./MeetingNotes/*.html

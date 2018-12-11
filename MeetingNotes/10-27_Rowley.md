@@ -21,4 +21,8 @@
 
 ## Todo
 Try to order hardware before break
-Deliverables: info on transmitter, getting basic information back from Vicon (position of one marker), be able to measure latency based on a tracking marker.
+
+Deliverables: 
+* info on transmitter
+* getting basic information back from Vicon (position of one marker)
+* be able to measure latency based on a tracking marker.
