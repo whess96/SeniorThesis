@@ -4,3 +4,9 @@
 
 # ignore compiled html files in MeetingNotes
 ./MeetingNotes/*.html
+
+# ignore previous theses. These can be found on the Google Drive
+./Past_Theses/*
+
+# Ignore build folders used for installing software
+/build/
