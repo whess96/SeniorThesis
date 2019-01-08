@@ -3,6 +3,7 @@ Repository for Alex Hsia and Will Hess's Princeton Senior Thesis
 
 ## Organization
 Timeline and Todo list can be found at https://trello.com/b/piCAc8gr/thesis
+
 Assorted non-code documents can be found at https://drive.google.com/drive/u/1/folders/1OhA2VEK-74bqbBii0FNRO-0e4JZKUwo7
 
 ## Dependencies
