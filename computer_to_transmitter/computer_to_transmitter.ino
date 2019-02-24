@@ -3,6 +3,8 @@
 //
 // Turn desired control inputs into ppm signal. This is sent via
 // audio cable to the radio transmitter and then to the RC plane.
+//
+// ISR code from: https://quadmeup.com/generate-ppm-signal-with-arduino/
 //-------------------------------------------------------------------
 
 //--------------------------GLOBAL VARIABLES-------------------------
