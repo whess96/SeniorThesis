@@ -1,0 +1,91 @@
+ THIS SOFTWARE AND ANY ACCOMPANYING DOCUMENTATION
+ IS RELEASED "AS IS".  THE U.S. GOVERNMENT MAKES NO
+ WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, CONCERNING
+ THIS SOFTWARE AND ANY ACCOMPANYING DOCUMENTATION,
+ INCLUDING, WITHOUT LIMITATION, ANY WARRANTIES OF
+ MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ IN NO EVENT WILL THE U.S. GOVERNMENT BE LIABLE FOR ANY
+ DAMAGES, INCLUDING LOST PROFITS, LOST SAVINGS OR OTHER
+ INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE 
+ USE, OR INABILITY TO USE, THIS SOFTWARE OR ANY
+ ACCOMPANYING DOCUMENTATION, EVEN IF INFORMED IN ADVANCE
+ OF THE POSSIBILITY OF SUCH DAMAGES.
+  ****************************************************
+  *    USAF STABILITY AND CONTROL  DIGITAL DATCOM    *
+  *    PROGRAM REV. JAN 96   DIRECT INQUIRIES TO:    *
+  *    WRIGHT LABORATORY  (WL/FIGC)  ATTN: W. BLAKE  *
+  *      WRIGHT PATTERSON AFB, OHIO  45433           *
+  *    PHONE (513) 255-6764,   FAX (513) 258-4054    *
+  ****************************************************
+ Preparing to start the big loop
+ At 1000
+1                         CONERR - INPUT ERROR CHECKING
+0 ERROR CODES - N* DENOTES THE NUMBER OF OCCURENCES OF EACH ERROR
+0 A - UNKNOWN VARIABLE NAME
+0 B - MISSING EQUAL SIGN FOLLOWING VARIABLE NAME
+0 C - NON-ARRAY VARIABLE HAS AN ARRAY ELEMENT DESIGNATION - (N)
+0 D - NON-ARRAY VARIABLE HAS MULTIPLE VALUES ASSIGNED
+0 E - ASSIGNED VALUES EXCEED ARRAY DIMENSION
+0 F - SYNTAX ERROR
+
+0******************************  INPUT DATA CARDS  ******************************
+
+ $FLTCON NMACH = 1.0, MACH(1)=0.60, NALPHA = 13.0,                                  ** ILLEGAL CONTROL CARD
+  ALSCHD(1) = -12.0, -10.0, -8.0, -6.0, -4.0, -2.0, 0.0, 2.0, 4.0, 6.0, 8.0, 10.0
+  NALT = 1.0, ALT(1) = 3.0,                                                      
+  WT = 1.1858$                                                                   
+ $SYNTHS XCG=0.115, ZCG=0.0, XW = 0.086, ZW = 0.039, XH = 0.3556, ZH = 0.003, XV    ** ILLEGAL CONTROL CARD
+ $BODY NX = 7.0,                                                                    ** ILLEGAL CONTROL CARD
+  X(1)= 0.0, 0.05715, 0.098425, 0.1905, 0.2413, 0.3048,                          
+  R(1)= 0.02638, 0.02638, 0.03002, 0.02101, 0.01746, 0.01062,                    
+  S(1)= 0.00213, 0.002596, 0.00344, 0.002068, 0.00141, 0.00059$                  
+ NACA-W-4-1105                                                                   
+  $WGPLNF CHRDTP = 0.1038, CHRDR = 0.1038, SSPNE = 0.32385, SSPN = 0.3429,       
+  SAVSI = 0.0, SAVASO = 0.0, TWSITA = 0.0,                                          ** ERROR **  2*A  0*B  0*C  0*D  0*E  0*F
+  CHSTAT = 0.25, DHDADI = 0.0, TYPE = 1.0$                                       
+ NACA-V-4-0001                                                                   
+  $VTPLNF CHRDTP = 0.04473, CHRDR = 0.1053, SSPNE = 0.08957, SSPN = 0.10285,     
+  SAVSI = 61.0, CHSTAT = 0.25, TYPE = 1.0$                                       
+ NACA-H-4-0001                                                                   
+  $HTPLNF CHRDTP = 0.04655, CHRDR = 0.07805, SSPNE = 0.12059, SSPN = 0.12863,    
+  SAVSI = 2.0, CHSTAT = 0.25, TYPE = 1.0$                                        
+ DIM M                                                                           
+ BUILD                                                                           
+ PLOT                                                                            
+ NEXT CASE                                                                       
+1          THE FOLLOWING IS A LIST OF ALL INPUT CARDS FOR THIS CASE.
+0
+ $FLTCON NMACH = 1.0, MACH(1)=0.60, NALPHA = 13.0,                               
+ ERROR IN CARD BELOW
+ $FLTCON NMACH = 1.0, MACH(1)=0.60, NALPHA = 13.0,                               
+  ALSCHD(1) = -12.0, -10.0, -8.0, -6.0, -4.0, -2.0, 0.0, 2.0, 4.0, 6.0, 8.0, 10.0
+  NALT = 1.0, ALT(1) = 3.0,                                                      
+  WT = 1.1858$                                                                   
+ $SYNTHS XCG=0.115, ZCG=0.0, XW = 0.086, ZW = 0.039, XH = 0.3556, ZH = 0.003, XV 
+ ERROR IN CARD BELOW
+ $SYNTHS XCG=0.115, ZCG=0.0, XW = 0.086, ZW = 0.039, XH = 0.3556, ZH = 0.003, XV 
+ $BODY NX = 7.0,                                                                 
+ ERROR IN CARD BELOW
+ $BODY NX = 7.0,                                                                 
+  X(1)= 0.0, 0.05715, 0.098425, 0.1905, 0.2413, 0.3048,                          
+  R(1)= 0.02638, 0.02638, 0.03002, 0.02101, 0.01746, 0.01062,                    
+  S(1)= 0.00213, 0.002596, 0.00344, 0.002068, 0.00141, 0.00059$                  
+ NACA-W-4-1105                                                                   
+  $WGPLNF CHRDTP = 0.1038, CHRDR = 0.1038, SSPNE = 0.32385, SSPN = 0.3429,       
+  SAVSI = 0.0, SAVASO = 0.0, TWSITA = 0.0,                                       
+  CHSTAT = 0.25, DHDADI = 0.0, TYPE = 1.0$                                       
+ NACA-V-4-0001                                                                   
+  $VTPLNF CHRDTP = 0.04473, CHRDR = 0.1053, SSPNE = 0.08957, SSPN = 0.10285,     
+  SAVSI = 61.0, CHSTAT = 0.25, TYPE = 1.0$                                       
+ NACA-H-4-0001                                                                   
+  $HTPLNF CHRDTP = 0.04655, CHRDR = 0.07805, SSPNE = 0.12059, SSPN = 0.12863,    
+  SAVSI = 2.0, CHSTAT = 0.25, TYPE = 1.0$                                        
+ DIM M                                                                           
+ BUILD                                                                           
+ PLOT                                                                            
+ NEXT CASE                                                                       
+ ERROR(S),THIS CASE NOT RUN
+1
+1          THE FOLLOWING IS A LIST OF ALL INPUT CARDS FOR THIS CASE.
+0
+1 END OF JOB.

@@ -5,16 +5,25 @@
 // audio cable to the radio transmitter and then to the RC plane.
 //
 // ISR code from: https://quadmeup.com/generate-ppm-signal-with-arduino/
-//-------------------------------------------------------------------
-
+//
+//--------------------------CHANNEL MAPPING--------------------------
+// 0: Throttle 1000 ppm is off, 2000 is full thrust
+// 1: Ailerons 1500 ppm is neutral, 1000 is full right roll, 2000 is full left roll
+// 2: Elevator 1500 ppm is neutral, 1000 is full down, 2000 is full up
+// 3: Rudder   1500 ppm is neutral, 1000 is yaw right, 2000 is yaw left
+// 4:
+// 5: Flaps    1000 ppm is 0 degree flap, 2000 is full flap
 //--------------------------GLOBAL VARIABLES-------------------------
-#define chanel_number 8  //set the number of chanels
-#define default_servo_value 1500  //set the default servo value
+#define chanel_number 6  //set the number of chanels
+#define default_servo_value 1000  //set the default servo value
 #define PPM_FrLen 22500  //set the PPM frame length in microseconds (1ms = 1000µs)
 #define PPM_PulseLen 300  //set the pulse length
 #define onState 1  //set polarity of the pulses: 1 is positive, 0 is negative
 #define sigPin 10  //set PPM signal output pin on the arduino
+#define begin_of_msg 123 //set signature of message start
 //-------------------------------------------------------------------
+
+
 
 /*this array holds the servo values for the ppm signal
  change theese values in your code (usually servo values move between 1000 and 2000)*/
@@ -23,6 +32,7 @@ int ppm[chanel_number];
 void setup() {
   // Open serial port
   Serial.begin(9600);
+//  Serial.setTimeout(50);
   
   //initiallize default ppm values
   for(int i=0; i<chanel_number; i++){
@@ -45,13 +55,17 @@ void setup() {
 
 void loop() {
   static int val = 100;
-  if (Serial.available() > 0) {
-  int command = Serial.read();
-  Serial.println("Command channel: " + command);
-    if (command >= 0 && command <= chanel_number) {
-      ppm[command] = ppm[command] + val;
-      if (ppm[command] >= 2000){ val = -100;}
-      if (ppm[command] <= 1000){ val = 100;}
+  if (Serial.available()) {
+    if (Serial.read() == begin_of_msg) {
+      // Read the commands from the python script
+      for (int i = 0; i < chanel_number; i++) {
+        ppm[i] = map(Serial.read(), 0, 255, 1000, 2000);
+      }
+      // Print out the commands read
+      Serial.println();
+      for (int i = 0; i < chanel_number; i++) {
+       Serial.println("    Channel " + String(i) + ": " + String(ppm[i])); 
+      }
     }
   }
 }

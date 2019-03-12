@@ -14,3 +14,6 @@ Building the python release of LCM can be a bit tempermental, and it was necessa
 
 ### Python3
 This project uses Apple's v3.6.1 Python release. It is recommended that the user works within a virtual environment to ensure their Python release is compatible.
+
+### PySerial
+Used to send infromation to serial ports using python scripts. https://pyserial.readthedocs.io/en/latest/index.html
