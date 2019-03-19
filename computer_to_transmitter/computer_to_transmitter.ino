@@ -5,7 +5,8 @@
 // audio cable to the radio transmitter and then to the RC plane.
 //
 // ISR code from: https://quadmeup.com/generate-ppm-signal-with-arduino/
-//
+
+
 //--------------------------CHANNEL MAPPING--------------------------
 // 0: Throttle 1000 ppm is off, 2000 is full thrust
 // 1: Ailerons 1500 ppm is neutral, 1000 is full right roll, 2000 is full left roll
@@ -13,6 +14,7 @@
 // 3: Rudder   1500 ppm is neutral, 1000 is yaw right, 2000 is yaw left
 // 4:
 // 5: Flaps    1000 ppm is 0 degree flap, 2000 is full flap
+
 //--------------------------GLOBAL VARIABLES-------------------------
 #define chanel_number 6  //set the number of chanels
 #define default_servo_value 1000  //set the default servo value
@@ -20,7 +22,6 @@
 #define PPM_PulseLen 300  //set the pulse length
 #define onState 1  //set polarity of the pulses: 1 is positive, 0 is negative
 #define sigPin 10  //set PPM signal output pin on the arduino
-#define begin_of_msg 123 //set signature of message start
 //-------------------------------------------------------------------
 
 
@@ -28,6 +29,8 @@
 /*this array holds the servo values for the ppm signal
  change theese values in your code (usually servo values move between 1000 and 2000)*/
 int ppm[chanel_number];
+// current index of ppm
+int curr;
 
 void setup() {
   // Open serial port
@@ -38,6 +41,8 @@ void setup() {
   for(int i=0; i<chanel_number; i++){
     ppm[i]= default_servo_value;
   }
+
+  curr = 0;
 
   pinMode(sigPin, OUTPUT);
   digitalWrite(sigPin, !onState);  //set the PPM signal pin to the default state (off)
@@ -54,17 +59,24 @@ void setup() {
 }
 
 void loop() {
-  static int val = 100;
-  if (Serial.available()) {
-    if (Serial.read() == begin_of_msg) {
-      // Read the commands from the python script
-      for (int i = 0; i < chanel_number; i++) {
-        ppm[i] = map(Serial.read(), 0, 255, 1000, 2000);
+  receivePWMInput();
+}
+
+void receivePWMInput() {
+  int begin_of_msg = 123; //set signature of message start
+  if (Serial.available() > 0) {
+    while (Serial.available() > 0) {
+      int temp = Serial.read();
+      
+      // "begin_of_msg" signal detected. Restart counter.
+      if (temp == begin_of_msg && curr >= chanel_number) {
+        curr = 0;
+        Serial.println();
       }
-      // Print out the commands read
-      Serial.println();
-      for (int i = 0; i < chanel_number; i++) {
-       Serial.println("    Channel " + String(i) + ": " + String(ppm[i])); 
+      else {
+        ppm[curr] = map(temp, 0, 255, 1000, 2000);
+        Serial.println("    Channel " + String(curr) + ": " + String(ppm[curr])); 
+        curr++;
       }
     }
   }

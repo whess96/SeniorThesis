@@ -1,4 +1,4 @@
-package vicon_t;
+package plane_data_t;
 
 /* angles and angular_rates are based on Euler angles
  of pitch, roll, yaw. */
@@ -6,5 +6,10 @@ struct vicon_state {
     double position[3];
     double angles[3];
     double velocity[3];
-    double anglular_rates[3];
+    double angular_rates[3];
+}
+
+/* actuations to be sent to the arduino */
+struct arduino_pwm {
+    double channels[6];
 }
