@@ -1,5 +1,4 @@
 ################################################################################
-#
 # run_contol_loop.sh
 #
 # Runs the full control loop for the plane. Involves running several python

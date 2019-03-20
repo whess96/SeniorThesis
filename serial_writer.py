@@ -12,18 +12,20 @@ import lcm
 from plane_data_t import arduino_pwm
 from numpy import interp
 
-################## Constants ####################
+#-------------------------------------------------------------------------------
+# Constants 
 pack_start = 123    # Send across to indicate new packet
-global comms_out
-#################################################
+global comms_in
+#-------------------------------------------------------------------------------
 
-comms_out = [0, 500, 500, 500, 500, 0]
+# Initial values for comms_in. Would result in a stopped plane.
+comms_in = [0, 500, 500, 500, 500, 0]
 
-# Packs the incomming data into the global varialbe channels_out
+# Packs the incomming data into the global varialbe comms_in
 def my_handler(channel, data):
-    global comms_out
+    global comms_in
     msg = arduino_pwm.decode(data)
-    comms_out = list(msg.channels)
+    comms_in = list(msg.channels)
 
 # Open up a serial port
 with serial.Serial('/dev/cu.usbmodem14101', 9600) as ser:
@@ -35,11 +37,11 @@ with serial.Serial('/dev/cu.usbmodem14101', 9600) as ser:
 
     while True:
         lc_in.handle()
-        print(comms_out)
+        print(comms_in)
         # Indicate 'start of packet'
         ser.write(struct.pack('>B', pack_start))
         # Send across control commands as bytes
-        for comm in comms_out:
+        for comm in comms_in:
             mapped_com = interp(comm, [0, 1000], [0, 255])
             ser.write(struct.pack('>B',int(mapped_com)))
 

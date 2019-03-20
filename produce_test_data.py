@@ -2,7 +2,6 @@
 # produce_test_data.py
 #
 # Produces test data to test out the code. "Simulates" flying the plane.
-#
 ################################################################################
 
 import lcm
