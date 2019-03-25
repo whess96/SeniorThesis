@@ -15,4 +15,4 @@ vicon_logs.txt
 /build/
 /lcm-1.4.0/
 /plane_data_t/
-/ViconDataStreamSDK/
+/ViconDataStreamSDK/*.dylib
