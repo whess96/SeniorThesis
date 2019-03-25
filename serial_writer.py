@@ -9,7 +9,7 @@
 
 import sys, serial, struct
 import lcm
-from plane_data_t import arduino_pwm
+from plane_data_t import control_commands
 from numpy import interp
 
 #-------------------------------------------------------------------------------
@@ -24,7 +24,7 @@ comms_in = [0, 500, 500, 500, 500, 0]
 # Packs the incomming data into the global varialbe comms_in
 def my_handler(channel, data):
     global comms_in
-    msg = arduino_pwm.decode(data)
+    msg = control_commands.decode(data)
     comms_in = list(msg.channels)
 
 # Open up a serial port
@@ -33,7 +33,7 @@ with serial.Serial('/dev/cu.usbmodem14101', 9600) as ser:
     ser.timeout = 50
 
     lc_in = lcm.LCM()
-    lc_in.subscribe("PWM_COMMANDS", my_handler)
+    lc_in.subscribe("CONTROL_COMMANDS", my_handler)
 
     while True:
         lc_in.handle()

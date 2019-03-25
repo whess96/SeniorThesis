@@ -8,7 +8,11 @@
 # ignore previous theses. These can be found on the Google Drive
 ./Past_Theses/*
 
+# ignore vicon log file
+vicon_logs.txt
+
 # Ignore build folders used for installing software
 /build/
 /lcm-1.4.0/
 /plane_data_t/
+/ViconDataStreamSDK/

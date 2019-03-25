@@ -7,7 +7,7 @@
 
 import lcm
 import numpy as np
-from plane_data_t import vicon_state, arduino_pwm
+from plane_data_t import vicon_state, control_commands
 
 #-------------------------------------------------------------------------------
 # Constants
@@ -19,10 +19,10 @@ A = [[ -0.0737,   -0.008,     0,         -9.8 ],
      [  0.1903,    -24.18,     23.8969,   0   ],
      [  0,         0,          1,         0   ]]
 # B state space matrix (fake numbers)
-B = [[ 1,   1 ],
-     [ 1,   1 ],
-     [ 1,   1 ],
-     [ 0,   0 ]]
+B = [[ 0,          1 ],
+     [ -20.4468,   1 ],
+     [ -264.7649,  1 ],
+     [ 0,          0 ]]
 #-------------------------------------------------------------------------------
 
 # Called by lc_in.handle(). Fills state_in array with appropriate values.
@@ -45,10 +45,10 @@ lc_out = lcm.LCM()
 try:
     while True:
         lc_in.handle()
-        output = arduino_pwm()
+        output = control_commands()
         
         output.channels = (0, 250, 500, 750, 333, 666) # Fake test data
-        lc_out.publish("PWM_COMMANDS", output.encode())
+        lc_out.publish("CONTROL_COMMANDS", output.encode())
 except KeyboardInterrupt:
     pass
 

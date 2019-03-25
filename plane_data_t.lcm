@@ -9,7 +9,7 @@ struct vicon_state {
     double angular_rates[3];
 }
 
-/* actuations to be sent to the arduino */
-struct arduino_pwm {
+/* actuations to be converted to PWM and sent to the arduino */
+struct control_commands {
     double channels[6];
 }
