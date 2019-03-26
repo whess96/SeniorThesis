@@ -10,6 +10,7 @@
 
 # ignore vicon log file
 vicon_logs.txt
+vicon_eflite_logs.txt
 
 # Ignore build folders used for installing software
 /build/

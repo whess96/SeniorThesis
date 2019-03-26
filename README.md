@@ -15,5 +15,9 @@ Building the python release of LCM can be a bit temperamental, and it was necess
 ### PySerial
 Used to send information through serial ports using python scripts. https://pyserial.readthedocs.io/en/latest/index.html
 
+### Vicon DataStream SDK
+Used to read in live positional data of the plane. Using v1.7.0.
+https://www.vicon.com/downloads/utilities-and-sdk/datastream-sdk/archive/datastream-sdk-171
+
 ### Python3
 This project uses Apple's v3.6.1 Python release. It is recommended that the user works within a virtual environment to ensure their Python release is compatible.

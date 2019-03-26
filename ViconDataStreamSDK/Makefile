@@ -6,4 +6,4 @@ test: ViconDataStreamSDK_CPPTest.cpp
 	g++ ViconDataStreamSDK_CPPTest.cpp -o test -lViconDataStreamSDK_CPP
 
 planedata: streamPlaneState.cpp
-	g++ streamPlaneState.cpp -o streamPlaneData -lViconDataStreamSDK_CPP
+	g++ streamPlaneState.cpp -o streamPlaneData -lViconDataStreamSDK_CPP -llcm 

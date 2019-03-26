@@ -23,6 +23,14 @@ B = [[ 0,          1 ],
      [ -20.4468,   1 ],
      [ -264.7649,  1 ],
      [ 0,          0 ]]
+
+# K control matrix (fake numbers)
+K = [[ 1, 0, 0, 0],
+     [ 0, 1, 0, 0],
+     [ 0, 0, 1, 0],
+     [ 0, 0, 0, 1],
+     [ 1, 0, 0, 0],
+     [ 0, 1, 0, 0]]
 #-------------------------------------------------------------------------------
 
 # Called by lc_in.handle(). Fills state_in array with appropriate values.
@@ -46,6 +54,7 @@ try:
     while True:
         lc_in.handle()
         output = control_commands()
+        # output.channels = np.matmul(K,state_in)
         
         output.channels = (0, 250, 500, 750, 333, 666) # Fake test data
         lc_out.publish("CONTROL_COMMANDS", output.encode())

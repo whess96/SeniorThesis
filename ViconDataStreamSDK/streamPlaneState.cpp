@@ -9,6 +9,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "DataStreamClient.h"
+#include <lcm/lcm-cpp.hpp>
+#include "../plane_data_t/vicon_state.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -149,7 +151,6 @@ namespace
 int main( int argc, char* argv[] )
 {
   // Program options
-  
   std::string HostName = "169.254.128.253:801";
   if( argc > 1 )
   {
@@ -224,6 +225,14 @@ int main( int argc, char* argv[] )
     size_t Counter = 0;
     clock_t LastTime = clock();
 
+    // Store previous translational and rotational positions for calculating
+    // velocities
+    double prevTrans [3];
+    double prevRot [3];
+
+    // Establish LCM
+    lcm::LCM lcm;
+
     // Loop until killed.
     while(true)
     {
@@ -254,7 +263,7 @@ int main( int argc, char* argv[] )
         Counter = 0;
       }
 
-       // Get the frame number
+      // Get the frame number
       Output_GetFrameNumber _Output_GetFrameNumber = MyClient.GetFrameNumber();
       output_stream << "Frame Number: " << _Output_GetFrameNumber.FrameNumber << std::endl;
 
@@ -320,6 +329,39 @@ int main( int argc, char* argv[] )
                                                         << _Output_GetSegmentLocalRotationEulerXYZ.Rotation[ 1 ]     << ", " 
                                                         << _Output_GetSegmentLocalRotationEulerXYZ.Rotation[ 2 ]     << ") " 
                                                         << Adapt( _Output_GetSegmentLocalRotationEulerXYZ.Occluded ) << std::endl;
+    
+    // Fill and send the LCM package
+    plane_data_t::vicon_state my_data;
+
+    double* currTrans = _Output_GetSegmentLocalTranslation.Translation;
+    my_data.position[0] = 1000*currTrans[0];
+    my_data.position[1] = 1000*currTrans[1];
+    my_data.position[2] = 1000*currTrans[2];
+
+    double* currRot = _Output_GetSegmentLocalRotationEulerXYZ.Rotation;
+    my_data.angles[0] = currRot[0];
+    my_data.angles[1] = currRot[0];
+    my_data.angles[2] = currRot[0];
+
+    // Calculate velocities
+    my_data.velocity[0] = (prevTrans[0] - currTrans[0])*Rate.FrameRateHz;
+    my_data.velocity[1] = (prevTrans[1] - currTrans[1])*Rate.FrameRateHz;
+    my_data.velocity[2] = (prevTrans[2] - currTrans[2])*Rate.FrameRateHz;
+
+    my_data.angular_rates[0] = (prevRot[0] - currRot[0])*Rate.FrameRateHz;
+    my_data.angular_rates[1] = (prevRot[1] - currRot[1])*Rate.FrameRateHz;
+    my_data.angular_rates[2] = (prevRot[2] - currRot[2])*Rate.FrameRateHz;
+
+    lcm.publish("FLIGHT_STATE", &my_data);
+
+    // Store current values for future velocity calculations
+    prevTrans[0] = currTrans[0];
+    prevTrans[1] = currTrans[1];
+    prevTrans[2] = currTrans[2];  
+    
+    prevRot[0] = currRot[0];
+    prevRot[1] = currRot[1];
+    prevRot[2] = currRot[2];
     }
   }
 }
