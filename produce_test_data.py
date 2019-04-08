@@ -6,18 +6,18 @@
 
 import lcm
 import time
-from plane_data_t import vicon_state
+from planeDataT import viconState
 
-flight_state = vicon_state()
+flightState = viconState()
 
 # Fake test data
-flight_state.position = (1.0, 1.0, 1.0)
-flight_state.angles = (2.0, 2.0, 2.0)
-flight_state.velocity = (3.0, 3.0, 3.0)
-flight_state.angular_rates = (4.0, 4.0, 4.0)
+flightState.position = (1.0, 1.0, 1.0)
+flightState.angles = (2.0, 2.0, 2.0)
+flightState.velocity = (3.0, 3.0, 3.0)
+flightState.angular_rates = (4.0, 4.0, 4.0)
 
 lc = lcm.LCM()
 
 while True:
-    lc.publish("FLIGHT_STATE", flight_state.encode())
+    lc.publish("FLIGHTSTATE", flightState.encode())
     time.sleep(1)

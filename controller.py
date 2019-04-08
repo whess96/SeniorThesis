@@ -7,44 +7,65 @@
 
 import lcm
 import numpy as np
-from plane_data_t import vicon_state, control_commands
+from planeDataT import viconState, controlCommands
 
 #-------------------------------------------------------------------------------
 # Constants
 global state_in  # global way to read in states: [u, w, q, theta]
 state_in = [0]*4
-# A state space matrix
-A = [[ -0.0737,   -0.008,     0,         -9.8 ],
-     [  -0.1643,   -14.6592,   10.32,     0   ],
-     [  0.1903,    -24.18,     23.8969,   0   ],
-     [  0,         0,          1,         0   ]]
-# B state space matrix (fake numbers)
-B = [[ 0,          1 ],
-     [ -20.4468,   1 ],
-     [ -264.7649,  1 ],
-     [ 0,          0 ]]
+global frame
+frame = 0
 
-# K control matrix (fake numbers)
-K = [[ 1, 0, 0, 0],
-     [ 0, 1, 0, 0],
-     [ 0, 0, 1, 0],
-     [ 0, 0, 0, 1],
-     [ 1, 0, 0, 0],
-     [ 0, 1, 0, 0]]
+# K control matrix
+# K = [[ 1, 0, 0, 0],
+#      [ 0, 1, 0, 0]]
+# K = [ 0.9445,   -1.2570,   -0.4805,   -4.8456]
+K = [0, 0, 0, 4]
 #-------------------------------------------------------------------------------
 
 # Called by lc_in.handle(). Fills state_in array with appropriate values.
 def my_handler(channel, data):
     print("Received message on channel \"%s\"" % channel)
     global state_in
-    msg = vicon_state.decode(data)
-    state_in[0] = msg.velocity[0]
-    state_in[1] = msg.velocity[1]
-    state_in[2] = msg.angular_rates[0]
-    state_in[3] = msg.angles[0]
+    global frame
+    msg = viconState.decode(data)
+    x_dot = msg.velocity[1]
+    z_dot = msg.velocity[2]
+    theta = msg.angles[0]
+    theta_dot = -msg.angularRates[0]
+    
+    u = x_dot*np.cos(theta) + z_dot*np.sin(theta)
+    w = -x_dot*np.sin(theta) + z_dot*np.cos(theta)
+    q = theta_dot
+
+    print("     Axis velocity (u):   ", u)
+    print("     Normal velocity (w): ", w)
+    print("     Pitch rate (q) :     ", q)
+    print("     Pitch angle (theta): ", theta)
+    print()
+
+    state_in[0] = u
+    state_in[1] = w
+    state_in[2] = q
+    state_in[3] = theta
+
+    frame = msg.frame
+
+# Apply control matrix K and map the new values to PWM [0,1000]
+def stateToPWM():
+    u = np.matmul(K, state_in)
+
+    thrust = 700
+    ail = 600
+    elev = np.interp(u, [np.radians(-100), np.radians(100)], [0,1000])
+    rudd = 500
+    flap = 0
+
+    return (thrust, ail, elev, rudd, 0, flap)
+
 
 lc_in = lcm.LCM()
-subscription = lc_in.subscribe("FLIGHT_STATE", my_handler)
+subscription = lc_in.subscribe("flightState", my_handler)
 
 lc_out = lcm.LCM()
 
@@ -53,11 +74,12 @@ lc_out = lcm.LCM()
 try:
     while True:
         lc_in.handle()
-        output = control_commands()
-        # output.channels = np.matmul(K,state_in)
+        output = controlCommands()        
+        output.channels = stateToPWM()
+        output.frame = frame
         
-        output.channels = (0, 250, 500, 750, 333, 666) # Fake test data
-        lc_out.publish("CONTROL_COMMANDS", output.encode())
+        # output.channels = (0, 500, 500, 500, 500, 0) # Fake test data
+        lc_out.publish("controlCommands", output.encode())
 except KeyboardInterrupt:
     pass
 
