@@ -7,11 +7,18 @@ struct viconState {
     double angles[3];
     double velocity[3];
     double angularRates[3];
-    int64_t frame;
+    int64_t timestamp;
 }
 
 /* actuations to be converted to PWM and sent to the arduino */
 struct controlCommands {
     double channels[6];
-    int64_t frame;
+    double controls;
+    int64_t timestamp;
+}
+
+/* The states used in the A and B matrix for building the controller */
+struct controlState {
+    double states[4];
+    int64_t timestamp;
 }

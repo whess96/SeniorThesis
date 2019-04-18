@@ -7,7 +7,7 @@
 ################################################################################
 
 import lcm
-import csv
+import csv, sys
 import numpy as np
 from planeDataT import viconState, controlCommands
 
@@ -35,14 +35,21 @@ def stateHandler(channel, data):
     states[1] = w
     states[2] = q
     states[3] = theta
-    states[5] = msg.frame
+    states[4] = msg.frame
 
 
 # Handler for reading control commands from LCM
 def controlHandler(channel, data):
     global comms
     msg = controlCommands.decode(data)
-    comms = list(msg.channels).append(msg.frame)
+    comms[0] = msg.channels[0]
+    comms[1] = msg.channels[1]
+    comms[2] = msg.channels[2]
+    comms[3] = msg.channels[3]
+    comms[4] = msg.channels[4]
+    comms[5] = msg.channels[5]
+
+    comms[6] = msg.frame
 
 with open('planeLogs.csv', 'w', newline='') as csvfile:
     csvWriter = csv.writer(csvfile, delimiter=',')
@@ -60,10 +67,12 @@ with open('planeLogs.csv', 'w', newline='') as csvfile:
         while True:
             lcState.handle()
             lcControl.handle()
-            csvWriter.writerow(state + comms)
+            row = states + comms
+            print(row)
+            # csvWriter.writerow(row)
 
-    except KeyboardInterrupt:
-        pass
+    except (KeyboardInterrupt, SystemExit):
+        sys.stderr.write("HI")
 
     lcState.unsubscribe(subState)
     lcControl.unsubscribe(subControl)

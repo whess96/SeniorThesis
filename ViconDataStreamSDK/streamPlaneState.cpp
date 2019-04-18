@@ -21,6 +21,7 @@
 #include <string.h>
 #include <unistd.h> // For sleep()
 #include <time.h>
+#include <sys/time.h>
 
 using namespace ViconDataStreamSDK::CPP;
 
@@ -157,7 +158,7 @@ int main( int argc, char* argv[] )
     HostName = argv[1];
   }
 
-  std::string LogFile = "vicon_eflite_logs.txt";
+  std::string LogFile = "viconEfliteLogs.txt";
   std::string AxisMapping = "ZUp";
 
   std::ofstream ofs;
@@ -232,7 +233,6 @@ int main( int argc, char* argv[] )
 
     // Establish LCM
     lcm::LCM lcm;
-    int frameNumber = 0;
 
     // Loop until killed.
     while(true)
@@ -334,42 +334,46 @@ int main( int argc, char* argv[] )
     // Fill and send the LCM package
     planeDataT::viconState myData;
 
-    double* currTrans = _Output_GetSegmentLocalTranslation.Translation;
-    myData.position[0] = currTrans[0]/1000;
-    myData.position[1] = currTrans[1]/1000;
-    myData.position[2] = currTrans[2]/1000;
+    struct timeval currTime;
+    gettimeofday(&currTime, NULL);
 
-    double* currRot = _Output_GetSegmentLocalRotationEulerXYZ.Rotation;
-    myData.angles[0] = currRot[0];
-    myData.angles[1] = currRot[1];
-    myData.angles[2] = currRot[2];
+    // If occluded, just don't publish this timestep.
+    if (!_Output_GetSegmentLocalTranslation.Occluded && 
+      !_Output_GetSegmentLocalRotationEulerXYZ.Occluded) {
+      double* currTrans = _Output_GetSegmentLocalTranslation.Translation;
+      double* currRot = _Output_GetSegmentLocalRotationEulerXYZ.Rotation;
 
-    // Calculate velocities
-    myData.velocity[0] = (prevTrans[0] - currTrans[0])*Rate.FrameRateHz/1000;
-    myData.velocity[1] = (prevTrans[1] - currTrans[1])*Rate.FrameRateHz/1000;
-    myData.velocity[2] = (prevTrans[2] - currTrans[2])*Rate.FrameRateHz/1000;
+      myData.position[0] = currTrans[0]/1000;
+      myData.position[1] = currTrans[1]/1000;
+      myData.position[2] = currTrans[2]/1000;
 
-    myData.angularRates[0] = (prevRot[0] - currRot[0])*Rate.FrameRateHz;
-    myData.angularRates[1] = (prevRot[1] - currRot[1])*Rate.FrameRateHz;
-    myData.angularRates[2] = (prevRot[2] - currRot[2])*Rate.FrameRateHz;
+      myData.angles[0] = currRot[0];
+      myData.angles[1] = currRot[1];
+      myData.angles[2] = currRot[2];
 
-    // Tag on a frame number for logging
-    myData.frame = frameNumber;
+      // Calculate velocities
+      myData.velocity[0] = (currTrans[0] - prevTrans[0])*Rate.FrameRateHz/1000;
+      myData.velocity[1] = (currTrans[1] - prevTrans[1])*Rate.FrameRateHz/1000;
+      myData.velocity[2] = (currTrans[2] - prevTrans[2])*Rate.FrameRateHz/1000;
 
-    lcm.publish("flightState", &myData);
+      myData.angularRates[0] = (currRot[0] - prevRot[0])*Rate.FrameRateHz;
+      myData.angularRates[1] = (currRot[1] - prevRot[1])*Rate.FrameRateHz;
+      myData.angularRates[2] = (currRot[2] - prevRot[2])*Rate.FrameRateHz;
 
-    // Store current values for future velocity calculations
-    prevTrans[0] = currTrans[0];
-    prevTrans[1] = currTrans[1];
-    prevTrans[2] = currTrans[2];  
-    
-    prevRot[0] = currRot[0];
-    prevRot[1] = currRot[1];
-    prevRot[2] = currRot[2];
+      myData.timestamp = (int64_t) currTime.tv_sec*1000000 + currTime.tv_usec;
 
-    frameNumber++;
+      lcm.publish("flightState", &myData);
+
+      // Store current values for future velocity calculations
+      prevTrans[0] = currTrans[0];
+      prevTrans[1] = currTrans[1];
+      prevTrans[2] = currTrans[2];  
+      
+      prevRot[0] = currRot[0];
+      prevRot[1] = currRot[1];
+      prevRot[2] = currRot[2];
     }
   }
+  }
 }
-
   

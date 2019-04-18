@@ -28,7 +28,7 @@ class viconState
 
         double     angularRates[3];
 
-        int64_t    frame;
+        int64_t    timestamp;
 
     public:
         /**
@@ -138,7 +138,7 @@ int viconState::_encodeNoHash(void *buf, int offset, int maxlen) const
     tlen = __double_encode_array(buf, offset + pos, maxlen - pos, &this->angularRates[0], 3);
     if(tlen < 0) return tlen; else pos += tlen;
 
-    tlen = __int64_t_encode_array(buf, offset + pos, maxlen - pos, &this->frame, 1);
+    tlen = __int64_t_encode_array(buf, offset + pos, maxlen - pos, &this->timestamp, 1);
     if(tlen < 0) return tlen; else pos += tlen;
 
     return pos;
@@ -160,7 +160,7 @@ int viconState::_decodeNoHash(const void *buf, int offset, int maxlen)
     tlen = __double_decode_array(buf, offset + pos, maxlen - pos, &this->angularRates[0], 3);
     if(tlen < 0) return tlen; else pos += tlen;
 
-    tlen = __int64_t_decode_array(buf, offset + pos, maxlen - pos, &this->frame, 1);
+    tlen = __int64_t_decode_array(buf, offset + pos, maxlen - pos, &this->timestamp, 1);
     if(tlen < 0) return tlen; else pos += tlen;
 
     return pos;
@@ -179,7 +179,7 @@ int viconState::_getEncodedSizeNoHash() const
 
 uint64_t viconState::_computeHash(const __lcm_hash_ptr *)
 {
-    uint64_t hash = 0x3e9233d4c4b7a501LL;
+    uint64_t hash = 0xee293f5d37d60dd7LL;
     return (hash<<1) + ((hash>>63)&1);
 }
 

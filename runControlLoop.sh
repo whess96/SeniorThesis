@@ -12,8 +12,8 @@ trap "exit" INT TERM ERR
 trap "kill 0" EXIT
 
 ./ViconDataStreamSDK/streamPlaneData > viconEfliteLogs.txt &
-# python observer.py &
 python controller.py &
 python serialWriter.py &
+python writeLogs.py &
 
 wait

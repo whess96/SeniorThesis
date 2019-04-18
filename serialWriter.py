@@ -18,7 +18,7 @@ pack_start = 123    # Send across to indicate new packet
 global comms_in
 #-------------------------------------------------------------------------------
 
-# Initial values for comms_in. Would result in a stopped plane.
+# Initial values for comms_in. Would result neutral actuation and no thrust.
 comms_in = [0, 500, 500, 500, 500, 0]
 
 # Packs the incomming data into the global varialbe comms_in
@@ -47,7 +47,7 @@ with serial.Serial('/dev/cu.usbmodem14101', 9600) as ser:
     while True:
         lc_in.handle()
         # comms_in = (100, 200, 300, 400, 500, 600)
-        print(comms_in)
+        # print(comms_in)
         # Indicate 'start of packet'
         ser.write(struct.pack('>B', pack_start))
         # Send across control commands as bytes

@@ -21,7 +21,7 @@
 #define PPM_FrLen 22500  //set the PPM frame length in microseconds (1ms = 1000µs)
 #define PPM_PulseLen 300  //set the pulse length
 #define onState 1  //set polarity of the pulses: 1 is positive, 0 is negative
-#define sigPin 7  //set PPM signal output pin on the arduino
+#define sigPin 6  //set PPM signal output pin on the arduino
 #define begin_of_msg 123 //set signature of message start
 //-------------------------------------------------------------------
 

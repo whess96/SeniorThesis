@@ -10,7 +10,7 @@ except ImportError:
 import struct
 
 class viconState(object):
-    __slots__ = ["position", "angles", "velocity", "angularRates", "frame"]
+    __slots__ = ["position", "angles", "velocity", "angularRates", "timestamp"]
 
     __typenames__ = ["double", "double", "double", "double", "int64_t"]
 
@@ -21,7 +21,7 @@ class viconState(object):
         self.angles = [ 0.0 for dim0 in range(3) ]
         self.velocity = [ 0.0 for dim0 in range(3) ]
         self.angularRates = [ 0.0 for dim0 in range(3) ]
-        self.frame = 0
+        self.timestamp = 0
 
     def encode(self):
         buf = BytesIO()
@@ -34,7 +34,7 @@ class viconState(object):
         buf.write(struct.pack('>3d', *self.angles[:3]))
         buf.write(struct.pack('>3d', *self.velocity[:3]))
         buf.write(struct.pack('>3d', *self.angularRates[:3]))
-        buf.write(struct.pack(">q", self.frame))
+        buf.write(struct.pack(">q", self.timestamp))
 
     def decode(data):
         if hasattr(data, 'read'):
@@ -52,14 +52,14 @@ class viconState(object):
         self.angles = struct.unpack('>3d', buf.read(24))
         self.velocity = struct.unpack('>3d', buf.read(24))
         self.angularRates = struct.unpack('>3d', buf.read(24))
-        self.frame = struct.unpack(">q", buf.read(8))[0]
+        self.timestamp = struct.unpack(">q", buf.read(8))[0]
         return self
     _decode_one = staticmethod(_decode_one)
 
     _hash = None
     def _get_hash_recursive(parents):
         if viconState in parents: return 0
-        tmphash = (0x3e9233d4c4b7a501) & 0xffffffffffffffff
+        tmphash = (0xee293f5d37d60dd7) & 0xffffffffffffffff
         tmphash  = (((tmphash<<1)&0xffffffffffffffff) + (tmphash>>63)) & 0xffffffffffffffff
         return tmphash
     _get_hash_recursive = staticmethod(_get_hash_recursive)

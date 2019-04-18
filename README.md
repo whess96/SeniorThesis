@@ -12,6 +12,9 @@ LCM is used to send information between various parts of our setup. LCM comes wi
 
 Building the python release of LCM can be a bit temperamental, and it was necessary to update XCode and reinstall glib to get it to install and build correctly.
 
+### Python3
+This project uses Apple's v3.6.1 Python release. It is recommended that the user works within a virtual environment to ensure their Python release is compatible.
+
 ### PySerial
 Used to send information through serial ports using python scripts. https://pyserial.readthedocs.io/en/latest/index.html
 
@@ -19,5 +22,5 @@ Used to send information through serial ports using python scripts. https://pyse
 Used to read in live positional data of the plane. Using v1.7.0.
 https://www.vicon.com/downloads/utilities-and-sdk/datastream-sdk/archive/datastream-sdk-171
 
-### Python3
-This project uses Apple's v3.6.1 Python release. It is recommended that the user works within a virtual environment to ensure their Python release is compatible.
+### Bokeh 
+Bokeh is a python package for data visualization. 
