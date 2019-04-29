@@ -1,2 +1,6 @@
-Frame rate = 2790.37 at Tue Apr 16 14:56:53 2019
+Frame rate = 3488.5 at Sun Apr 28 15:54:48 2019
+
+Frame rate = 3153.41 at Sun Apr 28 15:54:56 2019
+
+Frame rate = 2421 at Sun Apr 28 15:55:04 2019
 

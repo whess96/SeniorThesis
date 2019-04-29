@@ -1,24 +1,26 @@
-################################################################################
+#################################################################
 # serialWriter.py
 #
-# Used to send control signal to Arduino via serial. Packs control output into 
-# the range [0, 255] so each input can be sent over a single byte.
+# Used to send control signal to Arduino via serial. Packs 
+# control output into the range [0, 255] so each input can be 
+# sent over a single byte.
 #
 # Dependent on PySerial api to send data over serial port.
-################################################################################
+#################################################################
 
 import sys, serial, struct
 import lcm
 from planeDataT import controlCommands
 from numpy import interp
 
-#-------------------------------------------------------------------------------
+#----------------------------------------------------------------
 # Constants 
 pack_start = 123    # Send across to indicate new packet
 global comms_in
-#-------------------------------------------------------------------------------
+#----------------------------------------------------------------
 
-# Initial values for comms_in. Would result neutral actuation and no thrust.
+# Initial values for comms_in. Would result neutral actuation and
+# no thrust.
 comms_in = [0, 500, 500, 500, 500, 0]
 
 # Packs the incomming data into the global varialbe comms_in
@@ -46,8 +48,6 @@ with serial.Serial('/dev/cu.usbmodem14101', 9600) as ser:
 
     while True:
         lc_in.handle()
-        # comms_in = (100, 200, 300, 400, 500, 600)
-        # print(comms_in)
         # Indicate 'start of packet'
         ser.write(struct.pack('>B', pack_start))
         # Send across control commands as bytes

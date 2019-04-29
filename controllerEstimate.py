@@ -1,8 +1,8 @@
 #################################################################
-# controller.py
+# controllerEstimate.py
 #
 # Takes in the raw position and rotation data over lcm. Performs 
-# necessary control calculations using a physics based control 
+# necessary control calculations using a data based control 
 # matrix. Publishes the resulting control vector to a new lcm 
 # channel.
 #################################################################
@@ -11,14 +11,14 @@ import lcm
 import time
 import numpy as np
 from planeDataT import viconState, controlCommands, controlState
-
 #----------------------------------------------------------------
 # Constants & Global Variables
-global state_in  # global way to read in states: [u, w, q, theta]
-state_in = [0]*4
+# global way to read in states: [z, x_d, z_d, theta, theta_d]
+global state_in  
+state_in = [0]*5
 
-# K control matrix (Physics based)
-K = [0.0397, 0.0583, -0.1869, -0.5411]
+# K control matrix (Data based)
+K = [2.3309,   -0.0031,    0.0343,    0.0396,   -0.0024]
 #----------------------------------------------------------------
 
 # Called by lc_in.handle(). Fills state_in array with appropriate
@@ -26,29 +26,22 @@ K = [0.0397, 0.0583, -0.1869, -0.5411]
 def my_handler(channel, data):
     global state_in
     msg = viconState.decode(data)
-    x_dot = msg.velocity[1]
-    z_dot = msg.velocity[2]
-    theta = msg.angles[0]
-    theta_dot = msg.angularRates[0]
-    
-    u = x_dot*np.cos(theta) + z_dot*np.sin(theta)
-    w = -x_dot*np.sin(theta) + z_dot*np.cos(theta)
-    q = theta_dot
 
-    state_in[0] = u
-    state_in[1] = w
-    state_in[2] = q
-    state_in[3] = theta
+    state_in[0] = msg.position[2] - 1.4
+    state_in[1] = msg.velocity[1]
+    state_in[2] = msg.velocity[2]
+    state_in[3] = msg.angles[0]
+    state_in[4] = msg.angularRates[0]
 
 # Apply control matrix K and map the new values to PWM [0,1000]
 def stateToPWM():
     u = -np.matmul(K, state_in)
 
-    thrust = 600
-    ail = 520
+    thrust = 500
+    ail = 500
     elev = np.interp(u, [np.radians(-19), np.radians(19)], 
         [0,1000])
-    rudd = 540
+    rudd = 580
     flap = 0
 
     return (thrust, ail, elev, rudd, 0, flap)
@@ -71,13 +64,6 @@ try:
             [0, 1000], [-19, 19])
         output.timestamp = int(time.time()*1e6)
         lc_out.publish("controlCommands", output.encode())
-
-        # Publish the states for the sole purpose of logging the 
-        # data
-        stateLog = controlState()
-        stateLog.states = state_in
-        stateLog.timestamp = int(time.time()*1e6)
-        lc_out.publish("controlState", stateLog.encode())
 except KeyboardInterrupt:
     pass
 

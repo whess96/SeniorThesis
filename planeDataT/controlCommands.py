@@ -10,15 +10,16 @@ except ImportError:
 import struct
 
 class controlCommands(object):
-    __slots__ = ["channels", "controls", "timestamp"]
+    __slots__ = ["channels", "controlCalc", "controlAngle", "timestamp"]
 
-    __typenames__ = ["double", "double", "int64_t"]
+    __typenames__ = ["double", "double", "double", "int64_t"]
 
-    __dimensions__ = [[6], None, None]
+    __dimensions__ = [[6], None, None, None]
 
     def __init__(self):
         self.channels = [ 0.0 for dim0 in range(6) ]
-        self.controls = 0.0
+        self.controlCalc = 0.0
+        self.controlAngle = 0.0
         self.timestamp = 0
 
     def encode(self):
@@ -29,7 +30,7 @@ class controlCommands(object):
 
     def _encode_one(self, buf):
         buf.write(struct.pack('>6d', *self.channels[:6]))
-        buf.write(struct.pack(">dq", self.controls, self.timestamp))
+        buf.write(struct.pack(">ddq", self.controlCalc, self.controlAngle, self.timestamp))
 
     def decode(data):
         if hasattr(data, 'read'):
@@ -44,14 +45,14 @@ class controlCommands(object):
     def _decode_one(buf):
         self = controlCommands()
         self.channels = struct.unpack('>6d', buf.read(48))
-        self.controls, self.timestamp = struct.unpack(">dq", buf.read(16))
+        self.controlCalc, self.controlAngle, self.timestamp = struct.unpack(">ddq", buf.read(24))
         return self
     _decode_one = staticmethod(_decode_one)
 
     _hash = None
     def _get_hash_recursive(parents):
         if controlCommands in parents: return 0
-        tmphash = (0x99ab68685e0d8e85) & 0xffffffffffffffff
+        tmphash = (0xa3331b81fac80c1c) & 0xffffffffffffffff
         tmphash  = (((tmphash<<1)&0xffffffffffffffff) + (tmphash>>63)) & 0xffffffffffffffff
         return tmphash
     _get_hash_recursive = staticmethod(_get_hash_recursive)

@@ -13,7 +13,8 @@ struct viconState {
 /* actuations to be converted to PWM and sent to the arduino */
 struct controlCommands {
     double channels[6];
-    double controls;
+    double controlCalc;
+    double controlAngle;
     int64_t timestamp;
 }
 

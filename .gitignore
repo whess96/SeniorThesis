@@ -8,6 +8,10 @@
 # ignore previous theses. These can be found on the Google Drive
 ./Past_Theses/*
 
+# ignore logs, plots, and spreadsheets
+/logs/
+/spreadsheets/
+
 # ignore vicon log file
 vicon_logs.txt
 vicon_eflite_logs.txt

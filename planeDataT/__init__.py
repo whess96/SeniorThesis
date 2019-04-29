@@ -6,3 +6,4 @@ DO NOT MODIFY BY HAND!!!!
 from .viconState import viconState
 from .controlCommands import controlCommands
 from .controlState import controlState
+from .controlEstimateState import controlEstimateState

@@ -1,12 +1,12 @@
-////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
 // streamPlaneState.cpp
 //
-// Custom app for thesis that only reads the relevant state information of the 
-// plane. Uses the Vicon DataStream SDK.
+// Custom app for thesis that only reads the relevant state 
+// information of the plane. Uses the Vicon DataStream SDK.
 //
 // Local Translation: (X: Left, Y: Towards computers, Z: Up)
 // Local Rotation:    (Pitch, Roll, Yaw)
-////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
 
 #include "DataStreamClient.h"
 #include <lcm/lcm-cpp.hpp>
@@ -22,6 +22,7 @@
 #include <unistd.h> // For sleep()
 #include <time.h>
 #include <sys/time.h>
+#include <math.h>
 
 using namespace ViconDataStreamSDK::CPP;
 
@@ -167,21 +168,25 @@ int main( int argc, char* argv[] )
     ofs.open(LogFile.c_str());
     if(!ofs.is_open())
     {
-      std::cout << "Could not open log file <" << LogFile << ">...exiting" << std::endl;
+      std::cout << "Could not open log file <" << LogFile 
+        << ">...exiting" << std::endl;
       return 1;
     }
   }
   // Make a new client
   Client MyClient;
 
-  for(int i=0; i != 3; ++i) // repeat to check disconnecting doesn't wreck next connect
+  // repeat to check disconnecting doesn't wreck next connect
+  for(int i=0; i != 3; ++i)
   {
     // Connect to a server
-    std::cout << "Connecting to " << HostName << " ..." << std::flush;
+    std::cout << "Connecting to " << HostName << " ..." 
+      << std::flush;
     while( !MyClient.IsConnected().Connected )
     {
       bool ok = false;
-      ok = ( MyClient.Connect( HostName ).Result == Result::Success );
+      ok = 
+      ( MyClient.Connect( HostName ).Result == Result::Success );
 
       if(!ok)
       {
@@ -202,32 +207,37 @@ int main( int argc, char* argv[] )
     MyClient.EnableDebugData();
 
     // Set the streaming mode
-    //MyClient.SetStreamMode( ViconDataStreamSDK::CPP::StreamMode::ClientPull );
-    // MyClient.SetStreamMode( ViconDataStreamSDK::CPP::StreamMode::ClientPullPreFetch );
-    MyClient.SetStreamMode( ViconDataStreamSDK::CPP::StreamMode::ServerPush );
+    MyClient.SetStreamMode( 
+      ViconDataStreamSDK::CPP::StreamMode::ServerPush );
 
     // Set the global up axis
     MyClient.SetAxisMapping( Direction::Forward, 
                              Direction::Left, 
                              Direction::Up ); // Z-up
 
-    Output_GetAxisMapping _Output_GetAxisMapping = MyClient.GetAxisMapping();
-    std::cout << "Axis Mapping: X-" << Adapt( _Output_GetAxisMapping.XAxis ) 
-                           << " Y-" << Adapt( _Output_GetAxisMapping.YAxis ) 
-                           << " Z-" << Adapt( _Output_GetAxisMapping.ZAxis ) << std::endl;
+    Output_GetAxisMapping _Output_GetAxisMapping = 
+      MyClient.GetAxisMapping();
+    std::cout << "Axis Mapping: X-" << Adapt( 
+      _Output_GetAxisMapping.XAxis ) 
+                           << " Y-" << Adapt( 
+                            _Output_GetAxisMapping.YAxis ) 
+                           << " Z-" << Adapt( 
+                            _Output_GetAxisMapping.ZAxis ) 
+                           << std::endl;
 
     // Discover the version number
     Output_GetVersion _Output_GetVersion = MyClient.GetVersion();
     std::cout << "Version: " << _Output_GetVersion.Major << "." 
                              << _Output_GetVersion.Minor << "." 
-                             << _Output_GetVersion.Point << std::endl;
+                             << _Output_GetVersion.Point 
+                             << std::endl;
 
     size_t FrameRateWindow = 1000; // frames
     size_t Counter = 0;
     clock_t LastTime = clock();
 
-    // Store previous translational and rotational positions for calculating
-    // velocities
+    // Store previous translational and rotational positions for 
+    // calculating velocities
     double prevTrans [3];
     double prevRot [3];
 
@@ -241,7 +251,8 @@ int main( int argc, char* argv[] )
       output_stream << "Waiting for new frame...";
       while( MyClient.GetFrame().Result != Result::Success )
       {
-        // Sleep a little so that we don't lumber the CPU with a busy poll
+        // Sleep a little so that we don't lumber the CPU with a 
+        // busy poll
         sleep(1);
         output_stream << ".";
       }
@@ -249,7 +260,8 @@ int main( int argc, char* argv[] )
       if(++Counter == FrameRateWindow)
       {
         clock_t Now = clock();
-        double FrameRate = (double)(FrameRateWindow * CLOCKS_PER_SEC) / (double)(Now - LastTime);
+        double FrameRate = (double)(FrameRateWindow * 
+          CLOCKS_PER_SEC) / (double)(Now - LastTime);
         if(!LogFile.empty())
         {
           time_t rawtime;
@@ -257,7 +269,8 @@ int main( int argc, char* argv[] )
           time ( &rawtime );
           timeinfo = localtime ( &rawtime );
 
-          ofs << "Frame rate = " << FrameRate << " at " <<  asctime (timeinfo)<< std::endl;
+          ofs << "Frame rate = " << FrameRate << " at " 
+            <<  asctime (timeinfo)<< std::endl;
         }
 
         LastTime = Now;
@@ -265,115 +278,155 @@ int main( int argc, char* argv[] )
       }
 
       // Get the frame number
-      Output_GetFrameNumber _Output_GetFrameNumber = MyClient.GetFrameNumber();
-      output_stream << "Frame Number: " << _Output_GetFrameNumber.FrameNumber << std::endl;
+      Output_GetFrameNumber _Output_GetFrameNumber = 
+        MyClient.GetFrameNumber();
+      output_stream << "Frame Number: " 
+        << _Output_GetFrameNumber.FrameNumber << std::endl;
 
       Output_GetFrameRate Rate = MyClient.GetFrameRate();
-      std::cout << "Frame rate: "           << Rate.FrameRateHz          << std::endl;
+      std::cout << "Frame rate: " << Rate.FrameRateHz 
+        << std::endl;
 
       // Show frame rates
-      for( unsigned int FramerateIndex = 0 ; FramerateIndex < MyClient.GetFrameRateCount().Count ; ++FramerateIndex )
+      for( unsigned int FramerateIndex = 0 ; FramerateIndex 
+        < MyClient.GetFrameRateCount().Count ; ++FramerateIndex )
       {
-        std::string FramerateName  = MyClient.GetFrameRateName( FramerateIndex ).Name;
-        double      FramerateValue = MyClient.GetFrameRateValue( FramerateName ).Value;
+        std::string FramerateName  = 
+          MyClient.GetFrameRateName( FramerateIndex ).Name;
+        double      FramerateValue = 
+          MyClient.GetFrameRateValue( FramerateName ).Value;
 
-        output_stream << FramerateName << ": " << FramerateValue << "Hz" << std::endl;
+        output_stream << FramerateName << ": " << FramerateValue 
+          << "Hz" << std::endl;
       }
       output_stream << std::endl;
 
       // Get the timecode
-      Output_GetTimecode _Output_GetTimecode  = MyClient.GetTimecode();
+      Output_GetTimecode _Output_GetTimecode = 
+        MyClient.GetTimecode();
 
       output_stream << "Timecode: "
-                << _Output_GetTimecode.Hours               << "h "
-                << _Output_GetTimecode.Minutes             << "m " 
-                << _Output_GetTimecode.Seconds             << "s "
-                << _Output_GetTimecode.Frames              << "f "
-                << _Output_GetTimecode.SubFrame            << "sf " 
+                << _Output_GetTimecode.Hours            << "h "
+                << _Output_GetTimecode.Minutes          << "m " 
+                << _Output_GetTimecode.Seconds          << "s "
+                << _Output_GetTimecode.Frames           << "f "
+                << _Output_GetTimecode.SubFrame         << "sf " 
                 << std::endl << std::endl;
-
-      // Get the latency
-      // output_stream << "Latency: " << MyClient.GetLatencyTotal().Total << "s" << std::endl;
-      
-      // for( unsigned int LatencySampleIndex = 0 ; LatencySampleIndex < MyClient.GetLatencySampleCount().Count ; ++LatencySampleIndex )
-      // {
-      //   std::string SampleName  = MyClient.GetLatencySampleName( LatencySampleIndex ).Name;
-      //   double      SampleValue = MyClient.GetLatencySampleValue( SampleName ).Value;
-
-      //   output_stream << "  " << SampleName << " " << SampleValue << "s" << std::endl;
-      // }
-      // output_stream << std::endl;
 
       unsigned int SubjectIndex = 0;
       // Get the subject name
-      std::string SubjectName = MyClient.GetSubjectName( SubjectIndex ).SubjectName;
+      std::string SubjectName = 
+        MyClient.GetSubjectName( SubjectIndex ).SubjectName;
       output_stream << "    Name: " << SubjectName << std::endl;
 
       unsigned int SegmentIndex = 0;
       // Get the segment name
-      std::string SegmentName = MyClient.GetSegmentName( SubjectName, SegmentIndex ).SegmentName;
-      output_stream << "        Name: " << SegmentName << std::endl;
+      std::string SegmentName = 
+        MyClient.GetSegmentName( SubjectName, 
+          SegmentIndex ).SegmentName;
+      output_stream << "        Name: " << SegmentName 
+        << std::endl;
 
 
       // Get the local segment translation
-      Output_GetSegmentLocalTranslation _Output_GetSegmentLocalTranslation = 
-        MyClient.GetSegmentLocalTranslation( SubjectName, SegmentName );
-      output_stream << "        Local Translation: (" << _Output_GetSegmentLocalTranslation.Translation[ 0 ]  << ", " 
-                                                  << _Output_GetSegmentLocalTranslation.Translation[ 1 ]  << ", " 
-                                                  << _Output_GetSegmentLocalTranslation.Translation[ 2 ]  << ") " 
-                                                  << Adapt( _Output_GetSegmentLocalTranslation.Occluded ) << std::endl;
-
-      // Get the local segment rotation in EulerXYZ co-ordinates
-      Output_GetSegmentLocalRotationEulerXYZ _Output_GetSegmentLocalRotationEulerXYZ = 
-        MyClient.GetSegmentLocalRotationEulerXYZ( SubjectName, SegmentName );
-      output_stream << "        Local Rotation EulerXYZ: (" << _Output_GetSegmentLocalRotationEulerXYZ.Rotation[ 0 ]     << ", " 
-                                                        << _Output_GetSegmentLocalRotationEulerXYZ.Rotation[ 1 ]     << ", " 
-                                                        << _Output_GetSegmentLocalRotationEulerXYZ.Rotation[ 2 ]     << ") " 
-                                                        << Adapt( _Output_GetSegmentLocalRotationEulerXYZ.Occluded ) << std::endl;
-    
-    // Fill and send the LCM package
-    planeDataT::viconState myData;
-
-    struct timeval currTime;
-    gettimeofday(&currTime, NULL);
-
-    // If occluded, just don't publish this timestep.
-    if (!_Output_GetSegmentLocalTranslation.Occluded && 
-      !_Output_GetSegmentLocalRotationEulerXYZ.Occluded) {
-      double* currTrans = _Output_GetSegmentLocalTranslation.Translation;
-      double* currRot = _Output_GetSegmentLocalRotationEulerXYZ.Rotation;
-
-      myData.position[0] = currTrans[0]/1000;
-      myData.position[1] = currTrans[1]/1000;
-      myData.position[2] = currTrans[2]/1000;
-
-      myData.angles[0] = currRot[0];
-      myData.angles[1] = currRot[1];
-      myData.angles[2] = currRot[2];
-
-      // Calculate velocities
-      myData.velocity[0] = (currTrans[0] - prevTrans[0])*Rate.FrameRateHz/1000;
-      myData.velocity[1] = (currTrans[1] - prevTrans[1])*Rate.FrameRateHz/1000;
-      myData.velocity[2] = (currTrans[2] - prevTrans[2])*Rate.FrameRateHz/1000;
-
-      myData.angularRates[0] = (currRot[0] - prevRot[0])*Rate.FrameRateHz;
-      myData.angularRates[1] = (currRot[1] - prevRot[1])*Rate.FrameRateHz;
-      myData.angularRates[2] = (currRot[2] - prevRot[2])*Rate.FrameRateHz;
-
-      myData.timestamp = (int64_t) currTime.tv_sec*1000000 + currTime.tv_usec;
-
-      lcm.publish("flightState", &myData);
-
-      // Store current values for future velocity calculations
-      prevTrans[0] = currTrans[0];
-      prevTrans[1] = currTrans[1];
-      prevTrans[2] = currTrans[2];  
+      Output_GetSegmentLocalTranslation 
+        _Output_GetSegmentLocalTranslation = 
+        MyClient.GetSegmentLocalTranslation( SubjectName, 
+          SegmentName );
       
-      prevRot[0] = currRot[0];
-      prevRot[1] = currRot[1];
-      prevRot[2] = currRot[2];
+      // Get the local segment rotation in EulerXYZ co-ordinates
+      Output_GetSegmentLocalRotationEulerXYZ 
+        _Output_GetSegmentLocalRotationEulerXYZ = 
+        MyClient.GetSegmentLocalRotationEulerXYZ( SubjectName, 
+          SegmentName );
+    
+      // Fill and send the LCM package
+      planeDataT::viconState myData;
+
+      struct timeval currTime;
+      gettimeofday(&currTime, NULL);
+
+      // If occluded, just don't publish this timestep.
+      if (!_Output_GetSegmentLocalTranslation.Occluded && 
+        !_Output_GetSegmentLocalRotationEulerXYZ.Occluded) {
+        double* currTrans = 
+          _Output_GetSegmentLocalTranslation.Translation;
+        double* currRot = 
+          _Output_GetSegmentLocalRotationEulerXYZ.Rotation;
+
+        // Fix pitch angle so it fit in range [-pi/2, pi/2]
+        if (currRot[0] > M_PI/2) {
+          currRot[0] = currRot[0] - M_PI;
+        }
+        else if (currRot[0] < -M_PI/2) {
+          currRot[0] = currRot[0] + M_PI;
+        }
+
+        myData.position[0] = currTrans[0]/1000;
+        myData.position[1] = currTrans[1]/1000;
+        myData.position[2] = currTrans[2]/1000;
+
+        myData.angles[0] = currRot[0];
+        myData.angles[1] = currRot[1];
+        myData.angles[2] = currRot[2];
+
+        // Calculate velocities
+        myData.velocity[0] = (currTrans[0] - 
+          prevTrans[0])*Rate.FrameRateHz/1000;
+        myData.velocity[1] = (currTrans[1] - 
+          prevTrans[1])*Rate.FrameRateHz/1000;
+        myData.velocity[2] = (currTrans[2] - 
+          prevTrans[2])*Rate.FrameRateHz/1000;
+
+        myData.angularRates[0] = (currRot[0] - 
+          prevRot[0])*Rate.FrameRateHz;
+        myData.angularRates[1] = (currRot[1] - 
+          prevRot[1])*Rate.FrameRateHz;
+        myData.angularRates[2] = (currRot[2] - 
+          prevRot[2])*Rate.FrameRateHz;
+
+        myData.timestamp = (int64_t) currTime.tv_sec*1000000 + 
+          currTime.tv_usec;
+
+        lcm.publish("flightState", &myData);
+
+        // Store current values for future velocity calculations
+        prevTrans[0] = currTrans[0];
+        prevTrans[1] = currTrans[1];
+        prevTrans[2] = currTrans[2];  
+        
+        prevRot[0] = currRot[0];
+        prevRot[1] = currRot[1];
+        prevRot[2] = currRot[2];
+
+        // Print out the newly calculated values
+        output_stream << "        Local Trans: (" 
+          << currTrans[ 0 ]  << ", " 
+          << currTrans[ 1 ]  << ", " 
+          << currTrans[ 2 ]  << ") " 
+          << Adapt(_Output_GetSegmentLocalTranslation.Occluded) 
+          << std::endl;
+
+        output_stream << "        Local Trans Vel: (" 
+          << myData.velocity[ 0 ]     << ", " 
+          << myData.velocity[ 1 ]     << ", " 
+          << myData.velocity[ 2 ]     << ") " 
+          << std::endl;
+
+        output_stream << "        Local Rot EulerXYZ: (" 
+          << currRot[ 0 ]     << ", " 
+          << currRot[ 1 ]     << ", " 
+          << currRot[ 2 ]     << ") " 
+          << Adapt(_Output_GetSegmentLocalRotationEulerXYZ.Occluded)
+          << std::endl;
+
+        output_stream << "        Local Rot Vel: (" 
+          << myData.angularRates[ 0 ]     << ", " 
+          << myData.angularRates[ 1 ]     << ", " 
+          << myData.angularRates[ 2 ]     << ") " 
+          << std::endl;
+      }
     }
-  }
   }
 }
   
